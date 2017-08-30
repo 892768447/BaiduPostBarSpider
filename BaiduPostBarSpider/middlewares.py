@@ -18,10 +18,7 @@ __Copyright__ = "Copyright (c) 2017 Irony.\"[讽刺]"
 __Version__ = "Version 1.0"
 
 
-class BaiDuUserAgent(UserAgentMiddleware):
-    '''
-    #百度User-Agent
-    '''
+class UserAgent(UserAgentMiddleware):
 
     def __init__(self, user_agent=""):
         self.user_agent = user_agent

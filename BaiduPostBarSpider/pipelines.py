@@ -12,6 +12,7 @@ Created on 2017年8月28日
 from scrapy.exceptions import DropItem
 
 from BaiduPostBarSpider.items import ForumListItem  # @UnresolvedImport
+from BaiduPostBarSpider.models import ForumModel
 
 
 __Author__ = "By: Irony.\"[讽刺]\nQQ: 892768447\nEmail: 892768447@qq.com"
@@ -24,10 +25,23 @@ class ForumListItemPipeline(object):
     #百度爬虫首页帖子列表数据处理
     '''
 
+    def __init__(self, Session):
+        self.Session = Session
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(Session=crawler.settings.Session)
+#         return cls(Session=crawler.settings.get("Session"))
+
     def process_item(self, item, spider):
         if isinstance(item, ForumListItem):
-            print("**********",item.isNull())
-            if not item.isNull():
+            if item.isNull():
                 raise DropItem("this item is null")
-            return item
-        raise DropItem("this item is not ForumListItem")
+            # 数据库入库
+            session = self.Session()
+            user = ForumModel(**item)
+            session.merge(user)
+            session.commit()
+            session.close()
+            raise DropItem("this item into db ok")
+        return item

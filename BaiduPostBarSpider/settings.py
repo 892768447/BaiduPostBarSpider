@@ -19,6 +19,8 @@ BOT_NAME = 'BaiduPostBarSpider'
 SPIDER_MODULES = ['BaiduPostBarSpider.spiders']
 NEWSPIDER_MODULE = 'BaiduPostBarSpider.spiders'
 
+# 日志级别
+LOG_LEVEL = 'DEBUG'  # ERROR
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'BaiduPostBarSpider (+http://www.yourdomain.com)'
@@ -63,7 +65,7 @@ ROBOTSTXT_OBEY = False
 # DOWNLOADER_MIDDLEWARES = {
 #     #必需 ,禁用默认的middleware
 #     'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-#     'BaiduPostBarSpider.middlewares.BaiDuUserAgent': 88,
+#     'BaiduPostBarSpider.middlewares.UserAgent': 88,
 # }
 
 # Enable or disable extensions
@@ -74,13 +76,13 @@ ROBOTSTXT_OBEY = False
 
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
-ITEM_PIPELINES = {
-    'BaiduPostBarSpider.pipelines.ForumListItemPipeline': 300,
-}
+# ITEM_PIPELINES = {
+#     'BaiduPostBarSpider.pipelines.ForumListItemPipeline': 300,
+# }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html
-#AUTOTHROTTLE_ENABLED = True
+AUTOTHROTTLE_ENABLED = True
 # The initial download delay
 # 自动限速
 AUTOTHROTTLE_START_DELAY = 5
@@ -90,7 +92,7 @@ AUTOTHROTTLE_START_DELAY = 5
 # each remote server
 #AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
 # Enable showing throttling stats for every response received:
-#调试
+# 调试
 # AUTOTHROTTLE_DEBUG = True
 
 # Enable and configure HTTP caching (disabled by default)
