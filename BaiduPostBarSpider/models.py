@@ -27,6 +27,7 @@ class ForumModel(Base):
     __tablename__ = "forum"
     # 表结构
     post_id = Column(String(20), primary_key=True, doc="帖子ID")
+    post_title = Column(String(255), doc="帖子标题")
     author_name = Column(String(100), doc="发帖人")
     reply_num = Column(Integer(), doc="回复数量")
 

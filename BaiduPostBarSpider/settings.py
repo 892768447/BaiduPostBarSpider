@@ -23,7 +23,7 @@ NEWSPIDER_MODULE = 'BaiduPostBarSpider.spiders'
 LOG_LEVEL = 'DEBUG'  # ERROR
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = 'BaiduPostBarSpider (+http://www.yourdomain.com)'
+# USER_AGENT = 'BaiduPostBarSpider (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
 # 不遵循robots.txt规则
@@ -76,9 +76,9 @@ ROBOTSTXT_OBEY = False
 
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
-# ITEM_PIPELINES = {
-#     'BaiduPostBarSpider.pipelines.ForumListItemPipeline': 300,
-# }
+ITEM_PIPELINES = {
+    'BaiduPostBarSpider.pipelines.ForumListItemPipeline': 300,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html

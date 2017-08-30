@@ -9,10 +9,13 @@ Created on 2017年8月28日
 @file: pipelines
 @description: 
 '''
+
+import json
+
 from scrapy.exceptions import DropItem
 
-from BaiduPostBarSpider.items import ForumListItem  # @UnresolvedImport
-from BaiduPostBarSpider.models import ForumModel
+from BaiduPostBarSpider.items import ForumListItem, ForumTitleItem  # @UnresolvedImport
+from BaiduPostBarSpider.models import ForumModel  # @UnresolvedImport
 
 
 __Author__ = "By: Irony.\"[讽刺]\nQQ: 892768447\nEmail: 892768447@qq.com"
@@ -34,14 +37,36 @@ class ForumListItemPipeline(object):
 #         return cls(Session=crawler.settings.get("Session"))
 
     def process_item(self, item, spider):
-        if isinstance(item, ForumListItem):
-            if item.isNull():
-                raise DropItem("this item is null")
+        if isinstance(item, ForumTitleItem):
+            session = self.Session()  # 更新标题
+            forum = ForumModel(
+                post_id=item.get("post_id", "").split("?")[0],
+                post_title=item.get("post_title", "")
+            )
+            session.merge(forum)  # 存在则更新,不存在则插入
+            session.commit()  # 提交
+            session.close()
+            raise DropItem("update title ok")
+        elif isinstance(item, ForumListItem):
             # 数据库入库
             session = self.Session()
-            user = ForumModel(**item)
-            session.merge(user)
-            session.commit()
+            for data in item.get("data_field", []):  # 解析数据
+                try:
+                    data = json.loads(data)  # 尝试解析为json
+                except:
+                    continue
+                post_id = str(data.get("id", "")).split("?")[0]
+                author_name = data.get("author_name", "")
+                reply_num = data.get("reply_num", "")
+                if not post_id:
+                    continue
+                forum = ForumModel(
+                    post_id=post_id,
+                    author_name=author_name,
+                    reply_num=reply_num
+                )
+                session.merge(forum)  # 存在则更新,不存在则插入
+            session.commit()  # 批量提交
             session.close()
             raise DropItem("this item into db ok")
         return item
