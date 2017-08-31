@@ -12,8 +12,9 @@ Created on 2017年8月30日
 from sqlalchemy.engine import create_engine
 from sqlalchemy.ext.declarative.api import declarative_base
 from sqlalchemy.orm.session import sessionmaker
+from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.schema import Column
-from sqlalchemy.sql.sqltypes import Integer, String
+from sqlalchemy.sql.sqltypes import Integer, String, TIMESTAMP
 
 
 __version__ = "0.0.1"
@@ -30,6 +31,9 @@ class ForumModel(Base):
     post_title = Column(String(255), doc="帖子标题")
     author_name = Column(String(100), doc="发帖人")
     reply_num = Column(Integer(), doc="回复数量")
+    page_num = Column(Integer(), server_default="1", doc="页数")
+    store_time = Column(TIMESTAMP, server_default=text(
+        "CURRENT_TIMESTAMP"), doc="储存时间")
 
 
 def dbInit():

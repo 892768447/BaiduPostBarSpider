@@ -24,21 +24,20 @@ class ForumTitleItem(Item):
     '''
     post_id = Field(serializer=str)  # 当前页面帖子的ID
     post_title = Field(serializer=str)  # 当前页面帖子的标题
+    page_num = Field(serializer=str)  # 当前页面帖子的页数
 
 
 class ForumListItem(Item):
     '''
     #百度贴吧帖子列表
     '''
-
     data_field = Field(serializer=str)  # 当前页面帖子的集合
 
-    '''
-    post_id = Field(serializer=str)  # 帖子ID
-    author_name = Field(serializer=str)  # 发帖人
-    reply_num = Field(serializer=str)  # 回复数量
 
-    def isNull(self):
-        return self.get("post_id", "") == "" or \
-            self.get("author_name", "").strip() == ""
+class ForumContent(Item):
     '''
+    #帖子评论
+    '''
+    post_id = Field(serializer=str)  # 当前页面帖子的ID
+    post_content = Field(serializer=str)  # 评论
+    data_field = Field(serializer=str)  # 当前页面帖子的data字段

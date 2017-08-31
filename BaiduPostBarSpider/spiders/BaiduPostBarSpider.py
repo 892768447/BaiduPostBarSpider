@@ -13,7 +13,7 @@ Created on 2017年8月29日
 from scrapy.http import Request
 from scrapy.spiders import Spider
 
-from BaiduPostBarSpider.items import ForumListItem, ForumTitleItem
+from BaiduPostBarSpider.items import ForumListItem, ForumTitleItem,ForumContent
 from BaiduPostBarSpider.models import dbInit  # @UnresolvedImport
 
 
@@ -49,6 +49,14 @@ class BaiduPostBarSpider(Spider):
     ForumUrlXpath = '//li[normalize-space(@class)="j_thread_list clearfix"]//a[normalize-space(@class)="j_th_tit"]/@href'
     # 提取帖子标题
     ForumTitleXpath = '//h1[contains(@class,"core_title_txt")]/text()'
+    # 提取当前帖子页数
+    ForumPageXpath = '//div[normalize-space(@class)="pb_footer"]//li[normalize-space(@class)="l_reply_num"][1]/span[2]/text()'
+    # 提取当页帖子的
+    ForumContentItemXpath = '//div[contains(@class,"l_post j_l_post l_post_bright")]'
+    # 帖子评论中的data_field字段
+    ForumContentDataXpath = '@data-field'
+    # 提取当页帖子的评论(不含楼中楼)
+    ForumContetnsXpath = '//cc/div/text()'
 
     def __init__(self, *args, **kwargs):
         super(BaiduPostBarSpider, self).__init__(*args, **kwargs)
@@ -98,8 +106,15 @@ class BaiduPostBarSpider(Spider):
 
     def parse_forum(self, response):
         self.log("parse_forum")
+        # 标题和页数
         item = ForumTitleItem(
             post_id=response.meta.get("post_id"),
-            post_title=response.xpath(self.ForumTitleXpath).extract_first()
+            post_title=response.xpath(self.ForumTitleXpath).extract_first(),
+            page_num=response.xpath(self.ForumPageXpath).extract_first()
         )
         yield item
+        # 得到当前所有评论列表(只包含楼中楼的一部分)
+        item = ForumContent(
+        
+        )
+        forum_contents = response.xpath(self.ForumContentItemXpath)

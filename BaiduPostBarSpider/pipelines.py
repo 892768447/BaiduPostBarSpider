@@ -41,7 +41,8 @@ class ForumListItemPipeline(object):
             session = self.Session()  # 更新标题
             forum = ForumModel(
                 post_id=item.get("post_id", "").split("?")[0],
-                post_title=item.get("post_title", "")
+                post_title=item.get("post_title", ""),
+                page_num=item.get("page_num", 0)
             )
             session.merge(forum)  # 存在则更新,不存在则插入
             session.commit()  # 提交
