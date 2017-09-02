@@ -77,7 +77,9 @@ ROBOTSTXT_OBEY = False
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'BaiduPostBarSpider.pipelines.ForumListItemPipeline': 300,
+    'BaiduPostBarSpider.pipelines.ForumListItemsPipeline': 300,
+    'BaiduPostBarSpider.pipelines.ForumInfosItemPipeline': 301,
+    'BaiduPostBarSpider.pipelines.LzlCommentItemPipeline': 302
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

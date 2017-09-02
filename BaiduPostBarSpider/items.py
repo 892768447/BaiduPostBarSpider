@@ -17,32 +17,34 @@ __Author__ = "By: Irony.\"[讽刺]\nQQ: 892768447\nEmail: 892768447@qq.com"
 __Copyright__ = "Copyright (c) 2017 Irony.\"[讽刺]"
 __Version__ = "Version 1.0"
 
+
 class ForumListItems(Item):
     '''
     #百度贴吧帖子列表
     '''
-    post_ids = Field(serializer=list)#所有帖子ID
-    author_names = Field(serializer=list)#所有发帖人
-    reply_nums = Field(serializer=list)#回复数量
-    post_titles = Field(serializer=str)#帖子标题
+    post_ids = Field(serializer=list)  # 所有帖子ID
+    author_names = Field(serializer=list)  # 所有发帖人
+    reply_nums = Field(serializer=list)  # 回复数量
+    post_titles = Field(serializer=list)  # 帖子标题
 
 
 class ForumInfosItem(Item):
     '''
-    #帖子评论
+    #帖子主评论
     '''
     post_id = Field(serializer=str)  # 当前页面帖子的ID
-    post_title = Field(serializer=str)  # 当前页面帖子的标题
     page_num = Field(serializer=str)  # 当前页面帖子的页数
-    post_content = Field(serializer=str)  # 评论
-    data_field = Field(serializer=str)  # 当前页面帖子的data字段
+    post_ids = Field(serializer=list)  # 所有主评论ID
+    author_names = Field(serializer=list)  # 所有评论人
+    post_contents = Field(serializer=list)  # 评论
+    lzl_comment_nums = Field(serializer=list)  # 楼中楼评论数量
+
 
 class LzlCommentItem(Item):
     '''
     #楼中楼回复
     '''
     post_id = Field(serializer=str)  # 当前页面帖子的ID
-    post_content = Field(serializer=str)  # 回复内容
-    post_time = Field(serializer=str)  # 回复时间
-    data_field = Field(serializer=str)  # 回复中的data字段
-    
+    post_contents = Field(serializer=list)  # 回复内容
+    post_times = Field(serializer=list)  # 回复时间
+    author_names = Field(serializer=list)  # 回复中的data字段

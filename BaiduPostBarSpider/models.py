@@ -22,18 +22,23 @@ __version__ = "0.0.1"
 Base = declarative_base()
 
 
-class ForumModel(Base):
+class ForumListItemsModel(Base):
 
     # 表名
-    __tablename__ = "forum"
+    __tablename__ = "Forum_List_Items".lower()
     # 表结构
     post_id = Column(String(20), primary_key=True, doc="帖子ID")
     post_title = Column(String(255), doc="帖子标题")
     author_name = Column(String(100), doc="发帖人")
     reply_num = Column(Integer(), doc="回复数量")
-    page_num = Column(Integer(), server_default="1", doc="页数")
     store_time = Column(TIMESTAMP, server_default=text(
         "CURRENT_TIMESTAMP"), doc="储存时间")
+
+class ForumInfosItem(Base):
+    
+    # 表名
+    __tablename__ = "Forum_Infos_Item".lower()
+    # 表结构
 
 
 def dbInit():

@@ -9,6 +9,8 @@ Created on 2017年8月29日
 @file: spiders.BaiduPostBarSpider
 @description: 
 '''
+
+import json
 import math
 from time import time
 
@@ -18,7 +20,6 @@ from scrapy.spiders import Spider
 from BaiduPostBarSpider.items import ForumListItems, ForumInfosItem, \
     LzlCommentItem
 from BaiduPostBarSpider.models import dbInit  # @UnresolvedImport
-import logging
 
 
 __version__ = "0.0.1"
@@ -52,7 +53,7 @@ class BaiduPostBarSpider(Spider):
     LzlUrl = "https://tieba.baidu.com/p/comment?tid={tid}&pid={pid}&pn={pn}&t={t}"
 
     # 提取页面帖子信息
-    ForumListXpath = '//li[normalize-space(@class)="j_thread_list clearfix"]/@data-field'
+    ForumListXpath = '//li[normalize-space(@class)="j_thread_list clearfix"]'
     # 提取页面帖子ID
     ForumListIdsRegx = '"id":(\d+),'
     # 提取页面帖子作者
@@ -66,16 +67,16 @@ class BaiduPostBarSpider(Spider):
     ForumItemsXpath = '//div[contains(@class,"l_post j_l_post l_post_bright")]'
     # 提取当前帖子页数
     ForumItemPageXpath = '//div[normalize-space(@class)="pb_footer"]//li[normalize-space(@class)="l_reply_num"][1]/span[2]/text()'
-    # 提取当前帖子评论ID
+    #提取当前帖子评论ID
     ForumItemIdsRegx = '"post_id":(\d+),'
-    # 提取当前帖子评论人
+    #提取当前帖子评论人
     ForumItemAuthorsRegx = '"user_name":"(.*?)",'
     # 提取当页帖子的评论(不含楼中楼)
     ForumContentsXpath = '//cc/div/text()'
-    # 提取当页帖子楼中楼回复数量
+    #提取当页帖子楼中楼回复数量
     ForumItemLzlNumsRegx = '"comment_num":(\d+),'
-
-    # 楼中楼
+    
+    #楼中楼
     ForumItemLzlsXpath = '//li[contains(@class,"lzl_single_post j_lzl_s_p")]/@data-field'
     # 提取楼中楼回复
     ForumItemLzlContentsXpath = '//span[normalize-space(@class)="lzl_content_main"]/text()'
@@ -114,28 +115,21 @@ class BaiduPostBarSpider(Spider):
                           headers=Headers)
 
     def parse_forum_list(self, response):
-        '''
-        #提取帖子ID、标题、发帖人、回复数量
-        '''
+        # 提取所有帖子的id和作者
         self.log("parse_forum_list")
-        # 获取data-field字段
         forum_data_list = response.xpath(self.ForumListXpath)
-        # 正则从data里面提取帖子ID
-        post_ids = forum_data_list.re(self.ForumListIdsRegx)
+        post_ids = forum_data_list.re(self.ForumListIdsRegx).extract()
         item = ForumListItems(
             post_ids=post_ids,
-            # 正则从data里面提取发帖人
             author_names=forum_data_list.re(
-                self.ForumListAuthorsRegx),
-            # 正则从data里面提取回复数
-            reply_nums=forum_data_list.re(self.ForumListReplysRegx),
-            # 提取标题
-            post_titles=response.xpath(self.ForumListTitlesXpath).extract()
+                self.ForumListAuthorsRegx).extract(),
+            reply_nums=forum_data_list.re(self.ForumListReplysRegx).extract(),
+            post_titles=response.xpath(self.ForumListTitleXpath).extract()
         )
         self.log("yield item")
         # 交给Forum Item Pipline处理
         yield item
-        self.log("start get forum detail")
+        self.log("start into forum url")
         for tid in post_ids:
             # 进入该帖子爬取内容和页数
             yield Request(self.ForumUrl.format(tid=tid),
@@ -147,70 +141,61 @@ class BaiduPostBarSpider(Spider):
     def parse_forum(self, response):
         self.log("parse_forum")
         # 当前帖子信息
-        # 页数、当页主评论ID、当页主评论人、当页评论
-        # 获取从上面request传递过来的当前页面帖子的ID
-        post_id = response.meta.get("post_id")
-        # 提取当页帖子页数
-        page_num = response.xpath(self.ForumItemPageXpath).extract_first()
-        # 提取当页评论中的data-field字段
-        forum_data_list = response.xpath(self.ForumItemsXpath)
-        # 从data-field中提取所有主评论的ID
-        post_ids = forum_data_list.re(self.ForumItemIdsRegx)
-        # 从data-field中提取楼中楼回复页数
-        lzl_comment_nums = forum_data_list.re(self.ForumItemLzlNumsRegx)
+        # #标题、页数、当页评论、当页评论人信息
+        post_id = response.meta.get("post_id"),  # 当前页面帖子的ID
+        post_title = response.meta.get("post_title", response.xpath(
+            self.ForumTitleXpath).extract_first()),  # 标题
+        page_num = response.xpath(self.ForumPageXpath).extract_first()
+        forum_infos = response.xpath(self.ForumContentItemXpath)
+        data_field = forum_infos.xpath(self.DataFieldXpath).extract()
         item = ForumInfosItem(
             post_id=post_id,
+            post_title=post_title,
             page_num=page_num,  # 页数
-            post_ids=post_ids,
-            # 从data-field中提取所有主评论人
-            author_names=forum_data_list.re(self.ForumItemAuthorsRegx),
-            # 评论
-            post_contents=response.xpath(
-                self.ForumContentsXpath).extract(),
-            lzl_comment_nums=lzl_comment_nums
+            post_content=forum_infos.xpath(
+                self.ForumContentsXpath).extract(),  # 评论
+            data_field=data_field  # 当前页面帖子的data字段
         )
         # 由forum infos pipines处理入库
         yield item
-        # 爬取楼中楼
+        # 爬取楼中楼下一页
         try:
-            # 组合主评论ID和楼中楼数量
-            for pid, nums in zip(post_ids, lzl_comment_nums):
-                if nums != "0":  # 大于0
-                    # 总页数
-                    lzl_total_page_num = math.ceil(
-                        int(nums) / self.LzlPageSize)
-                    for pn in range(1, lzl_total_page_num):
-                        yield Request(
-                            self.LzlUrl.format(
-                                tid=post_id, pid=pid, pn=pn, t=time()),
-                            meta={"post_id": post_id, "pid": pid},
-                            callback=self.parse_lzl_comment,
-                            headers=Headers)
-        except Exception as e:
-            self.log(str(e), logging.ERROR)
-        if response.meta.get("next_page", 0) and page_num:  # 判断是不是循环爬取下一页
-            self.log("get next page")
+            # 从data_field中获取楼中楼总评论条数
+            _content = json.loads(data_field).get("content", None)
+            if _content:
+                post_pid = _content.get("post_id")  # 这个post_id是主评论的ID
+                lzl_comment_num = _content.get("comment_num", 0)
+                # 总页数
+                lzl_page_num = math.ceil(lzl_comment_num / self.LzlPageSize)
+                for pn in range(1, lzl_page_num):
+                    yield Request(
+                        self.LzlUrl.format(
+                            tid=post_id, pid=post_pid, pn=pn, t=time()),
+                        meta={"post_id": post_id, "post_pid": post_pid,
+                              "post_title": post_title},
+                        callback=self.parse_lzl_comment,
+                        headers=Headers)
+        except:
+            pass
+        if response.meta.get("next_page", 0):  # 判断是不是循环爬取下一页
             # 继续爬取帖子下一页
             try:
-                for pn in range(1, int(page_num)):
+                for pn in range(1, page_num):
                     yield Request(
                         self.ForumNexUrl.format(tid=post_id, pn=pn),
-                        meta={"post_id": post_id},
+                        meta={"post_id": post_id, "post_title": post_title},
                         callback=self.parse_forum,  # 调用本函数继续解析,但是不循环去抓取下一页了
                         headers=Headers)
-            except Exception as e:
-                self.log(str(e), logging.ERROR)
+            except:
+                pass
 
     def parse_lzl_comment(self, response):
         self.log("parse_lzl_comment")
         # 回复中的楼中楼评论解析
         item = LzlCommentItem(
-            # 获取request传递过来的帖子ID
             post_id=response.meta.get("post_id"),
-            post_contents=response.xpath(
-                self.ForumItemLzlContentsXpath).extract(),
-            post_times=response.xpath(self.ForumItemLzlTimesXpath).extract(),
-            author_names=response.xpath(self.ForumItemLzlsXpath).re(
-                self.ForumItemLzlAuthorsRegx),
+            post_content=response.xpath(self.ForumContentsLzl).extract(),
+            post_time=response.xpath(self.ForumContentsTime).extract(),
+            data_field=response.xpath(self.ForumContentsData).extract(),
         )
         yield item
