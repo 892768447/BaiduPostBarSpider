@@ -8,6 +8,30 @@ Created on 2017年8月28日
 @email: 892768447@qq.com
 @file: items
 @description: 
+
+1、前几页
+    帖子ID post_id
+    标题 post_title
+    发帖人 author_name
+    回复数量 reply_num
+    帖子链接 http://tieba.baidu.com/p/post_id
+   
+2、进入帖子
+    该页帖子ID post_id
+    当页所有评论主ID comment_ids
+    当页所有评论人 author_names
+    当页所有评论时间 post_times
+    当页所有评论内容 post_comtents
+    ###（无需入库）当页所有评论的楼层回复数量 comment_num
+    当前主楼层链接http://tieba.baidu.com/p/post_id?pn=页数#comment_id + "l"
+
+3、楼中楼回复
+    该页帖子ID post_id
+    该页帖子主评论ID comment_id
+    当页楼中楼所有评论人 author_names
+    当页楼中楼所有评论时间 post_times
+    当页楼中楼所有评论内容 post_comtents
+    当前主楼层链接http://tieba.baidu.com/p/post_id?pn=页数#comment_id + "l"
 '''
 
 from scrapy.item import Item, Field
