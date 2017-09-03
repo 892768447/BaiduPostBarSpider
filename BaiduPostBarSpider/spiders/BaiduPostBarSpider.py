@@ -167,7 +167,8 @@ class BaiduPostBarSpider(Spider):
             # 评论
             post_contents=response.xpath(
                 self.ForumContentsXpath).extract(),
-            lzl_comment_nums=lzl_comment_nums
+            lzl_comment_nums=lzl_comment_nums,
+            post_url=self.ForumUrl.format(tid=post_id)
         )
         # 由forum infos pipines处理入库
         yield item
@@ -207,10 +208,13 @@ class BaiduPostBarSpider(Spider):
         item = LzlCommentItem(
             # 获取request传递过来的帖子ID
             post_id=response.meta.get("post_id"),
+            # 获取requests传递过来的主评论ID
+            comment_id=response.meta.get("pid"),
             post_contents=response.xpath(
                 self.ForumItemLzlContentsXpath).extract(),
             post_times=response.xpath(self.ForumItemLzlTimesXpath).extract(),
             author_names=response.xpath(self.ForumItemLzlsXpath).re(
                 self.ForumItemLzlAuthorsRegx),
+            post_url=respons
         )
         yield item

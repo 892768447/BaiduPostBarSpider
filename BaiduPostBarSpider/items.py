@@ -36,8 +36,10 @@ class ForumInfosItem(Item):
     page_num = Field(serializer=str)  # 当前页面帖子的页数
     post_ids = Field(serializer=list)  # 所有主评论ID
     author_names = Field(serializer=list)  # 所有评论人
+    post_times = Field(serializer=list)  # 回复时间
     post_contents = Field(serializer=list)  # 评论
     lzl_comment_nums = Field(serializer=list)  # 楼中楼评论数量
+    post_url = Field(serializer=str)  # 帖子链接
 
 
 class LzlCommentItem(Item):
@@ -45,6 +47,7 @@ class LzlCommentItem(Item):
     #楼中楼回复
     '''
     post_id = Field(serializer=str)  # 当前页面帖子的ID
-    post_contents = Field(serializer=list)  # 回复内容
+    comment_id = Field(serializer=str)  # 当前主评论ID
+    author_names = Field(serializer=list)  # 回复中的评论人
     post_times = Field(serializer=list)  # 回复时间
-    author_names = Field(serializer=list)  # 回复中的data字段
+    post_contents = Field(serializer=list)  # 回复内容

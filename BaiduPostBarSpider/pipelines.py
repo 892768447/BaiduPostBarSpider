@@ -13,7 +13,8 @@ Created on 2017年8月28日
 from scrapy.exceptions import DropItem
 
 from BaiduPostBarSpider.items import ForumListItems, ForumInfosItem, LzlCommentItem
-from BaiduPostBarSpider.models import ForumModel  # @UnresolvedImport
+from BaiduPostBarSpider.models import ForumListItemsModel
+from datetime import datetime
 
 
 # @UnresolvedImport
@@ -36,7 +37,24 @@ class ForumListItemsPipeline(object):
 
     def process_item(self, item, spider):
         if isinstance(item, ForumListItems):
-            print("ForumListItems: ", ForumListItems)
+            # 数据库session
+            session = self.Session()
+            for post_id, post_title, author_name, reply_num in zip(
+                item.get("post_ids", []),
+                item.get("post_titles", []),
+                item.get("author_names", []),
+                item.get("reply_nums", [])
+            ):
+                model = ForumListItemsModel(
+                    post_id=post_id,
+                    post_title=post_title,
+                    author_name=author_name.encode().decode("unicode_escape") \
+                        if author_name.find(r"\u") > -1 else author_name,  # 把\\u 转成中文
+                    reply_num=reply_num
+                )
+                session.merge(model)  # 存在则更新,不存在则插入
+            session.commit()  # 批量提交
+            session.close()
             raise DropItem("this ForumListItems into db ok")
         return item
 
@@ -55,7 +73,26 @@ class ForumInfosItemPipeline(object):
 
     def process_item(self, item, spider):
         if isinstance(item, ForumInfosItem):
-            print("ForumInfosItem: ", ForumInfosItem)
+            # 数据库session
+            session = self.Session()
+            post_id = item.get("post_id", "")  # 帖子ID
+            for comment_id, author_name, post_content, post_time in zip(
+                item.get("post_ids", []),  # 主评论ID
+                item.get("author_names", []),
+                item.get("post_contents", []),
+                item.get("post_times", datetime.now())  # 评论时间
+            ):
+                model = ForumListItemsModel(
+                    post_id=post_id,
+                    comment_id=comment_id,
+                    author_name=author_name.encode().decode("unicode_escape") \
+                        if author_name.find(r"\u") > -1 else author_name,  # 把\\u 转成中文
+                    post_content=post_content,
+                    post_time=post_time
+                )
+                session.merge(model)  # 存在则更新,不存在则插入
+            session.commit()  # 批量提交
+            session.close()
             raise DropItem("this ForumInfosItem into db ok")
         return item
 
@@ -74,6 +111,25 @@ class LzlCommentItemPipeline(object):
 
     def process_item(self, item, spider):
         if isinstance(item, LzlCommentItem):
-            print("LzlCommentItem: ", LzlCommentItem)
+            # 数据库session
+            session = self.Session()
+            post_id = item.get("post_id", "")  # 帖子ID
+            for comment_id, author_name, post_content, post_time in zip(
+                item.get("post_ids", []),  # 主评论ID
+                item.get("author_names", []),
+                item.get("post_contents", []),
+                item.get("post_times", datetime.now())  # 评论时间
+            ):
+                model = ForumListItemsModel(
+                    post_id=post_id,
+                    comment_id=comment_id,
+                    author_name=author_name.encode().decode("unicode_escape") \
+                        if author_name.find(r"\u") > -1 else author_name,  # 把\\u 转成中文
+                    post_content=post_content,
+                    post_time=post_time
+                )
+                session.merge(model)  # 存在则更新,不存在则插入
+            session.commit()  # 批量提交
+            session.close()
             raise DropItem("this LzlCommentItem into db ok")
         return item

@@ -20,7 +20,7 @@ SPIDER_MODULES = ['BaiduPostBarSpider.spiders']
 NEWSPIDER_MODULE = 'BaiduPostBarSpider.spiders'
 
 # 日志级别
-LOG_LEVEL = 'DEBUG'  # ERROR
+LOG_LEVEL = 'INFO'  # ERROR INFO DEBUG
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = 'BaiduPostBarSpider (+http://www.yourdomain.com)'
