@@ -130,7 +130,9 @@ class BaiduPostBarSpider(Spider):
             # 正则从data里面提取回复数
             reply_nums=forum_data_list.re(self.ForumListReplysRegx),
             # 提取标题
-            post_titles=response.xpath(self.ForumListTitlesXpath).extract()
+            post_titles=response.xpath(self.ForumListTitlesXpath).extract(),
+            # 帖子链接
+            post_urls=[self.ForumUrl.format(tid=tid) for tid in post_ids]
         )
         self.log("yield item")
         # 交给Forum Item Pipline处理
