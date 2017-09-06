@@ -48,9 +48,11 @@ class ForumListItems(Item):
     #百度贴吧帖子列表
     '''
     post_ids = Field(serializer=list)  # 所有帖子ID
+    school_name = Field(serializer=str)  # 学校名称
     post_titles = Field(serializer=list)  # 帖子标题
     author_names = Field(serializer=list)  # 所有发帖人
     reply_nums = Field(serializer=list)  # 回复数量
+    post_urls = Field(serializer=list)  # 帖子链接
 
 
 class ForumInfosItem(Item):

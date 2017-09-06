@@ -19,8 +19,11 @@ BOT_NAME = 'BaiduPostBarSpider'
 SPIDER_MODULES = ['BaiduPostBarSpider.spiders']
 NEWSPIDER_MODULE = 'BaiduPostBarSpider.spiders'
 
+# 同时处理的ITEM数量
+CONCURRENT_ITEMS = 200
+
 # 日志级别
-LOG_LEVEL = 'INFO'  # ERROR INFO DEBUG
+LOG_LEVEL = 'ERROR'  # ERROR INFO DEBUG
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = 'BaiduPostBarSpider (+http://www.yourdomain.com)'
@@ -30,15 +33,15 @@ LOG_LEVEL = 'INFO'  # ERROR INFO DEBUG
 ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-#CONCURRENT_REQUESTS = 32
-
+CONCURRENT_REQUESTS = 64
+REQUESTS = 32
 # Configure a delay for requests for the same website (default: 0)
 # See http://scrapy.readthedocs.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-#DOWNLOAD_DELAY = 3
+DOWNLOAD_DELAY = 1
 # The download delay setting will honor only one of:
-#CONCURRENT_REQUESTS_PER_DOMAIN = 16
-#CONCURRENT_REQUESTS_PER_IP = 16
+CONCURRENT_REQUESTS_PER_DOMAIN = 32
+CONCURRENT_REQUESTS_PER_IP = 32
 
 # Disable cookies (enabled by default)
 #COOKIES_ENABLED = False
@@ -71,8 +74,8 @@ ROBOTSTXT_OBEY = False
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html
 # EXTENSIONS = {
-#    'scrapy.extensions.telnet.TelnetConsole': None,
-#}
+#     'scrapy.extensions.telnet.TelnetConsole': None,
+# }
 
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
@@ -89,7 +92,7 @@ AUTOTHROTTLE_ENABLED = True
 # 自动限速
 AUTOTHROTTLE_START_DELAY = 5
 # The maximum download delay to be set in case of high latencies
-#AUTOTHROTTLE_MAX_DELAY = 60
+AUTOTHROTTLE_MAX_DELAY = 60
 # The average number of requests Scrapy should be sending in parallel to
 # each remote server
 #AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
