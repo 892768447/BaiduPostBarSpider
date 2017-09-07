@@ -9,6 +9,7 @@ Created on 2017年8月29日
 @file: spiders.BaiduPostBarSpider
 @description: 
 '''
+from datetime import datetime
 import logging
 import math
 import os
@@ -48,7 +49,7 @@ class BaiduPostBarSpider(Spider):
         "东星航空学院", "四川工商职业技术学院", "眉山职业技术学院",
         "眉职院", "眉山城市职业技术学院", "成艺", "四川科技职业学院", "成都信息工程学院"
     ]
-    MaxPage = 8  # 最大8页
+    MaxPage = 5  # 最大8页
     LzlPageSize = 10  # 楼中楼一页的显示数量
     ForumListUrl = "http://tieba.baidu.com/f?kw={kw}&ie=utf-8&pn={pn}"
     ForumUrl = "http://tieba.baidu.com/p/{tid}"  # 帖子详情
@@ -117,6 +118,9 @@ class BaiduPostBarSpider(Spider):
     '''
 
     def start_requests(self):
+        if 0 <= datetime.now().hour < 9:
+            self.log("0-8点不采集")
+            return
         for school_name, url in self.start_urls:
             yield Request(url, meta={"school_name": school_name}, callback=self.parse_forum_list,
                           headers=Headers)

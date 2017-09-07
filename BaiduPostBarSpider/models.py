@@ -54,13 +54,13 @@ class ForumCommentItemsModel(Base):
 
 
 def dbInit():
-    engine = create_engine("mysql+pymysql://root:aj1@msmobile@127.0.0.1")
+    engine = create_engine("mysql+pymysql://root:root@10.105.160.68")
     # 创建数据库
     with engine.connect() as con:
         con.execute(
             "CREATE DATABASE IF NOT EXISTS baidupostbar CHARACTER SET utf8;")
     engine = create_engine(
-        "mysql+pymysql://root:aj1@msmobile@127.0.0.1/baidupostbar?charset=utf8",
+        "mysql+pymysql://root:root@10.105.160.68/baidupostbar?charset=utf8",
         isolation_level="READ UNCOMMITTED",
         pool_size=16)  # 16个线程
     Base.metadata.create_all(engine)
