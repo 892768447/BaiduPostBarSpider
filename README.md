@@ -1,0 +1,4 @@
+#BaiduPostBarSpider
+
+学习scrapy而写的简单的百度贴吧最新数据采集
+目的用于校园营销时的负面帖子
